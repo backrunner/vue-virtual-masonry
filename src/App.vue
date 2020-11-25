@@ -1,28 +1,94 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+  <div class="container">
+    <div class="title">Vue Virtual Masonry</div>
+    <div class="masonry">
+      <VirtualMasonry
+        :items="items"
+        :col="5"
+        :fit="true"
+        :colWidth="200"
+        :itemHeightGetter="heightGetter"
+      >
+        <template slot-scope="props">
+          <p>{{ props.data._masonryIndex }}</p>
+        </template>
+      </VirtualMasonry>
+    </div>
+    <div class="footer">
+      <span>Made by BackRunner.</span>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
-
 export default {
-  name: "App",
-  components: {
-    HelloWorld
+  data() {
+    return {
+      items: []
+    };
+  },
+  created() {
+    // generate items
+    const items = [];
+    for (let i = 0; i < 50; i++) {
+      items.push({
+        height: this.getRandomInt(100, 1000)
+      });
+    }
+    this.$set(this, "items", items);
+  },
+  methods: {
+    heightGetter(item) {
+      return item.height;
+    },
+    getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
   }
 };
 </script>
 
-<style>
+<style lang="less">
+html,
+body,
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  width: 100%;
+  min-height: 100vh;
+}
+body,
+#app {
+  margin: 0;
+  position: relative;
+}
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  .title {
+    height: 120px;
+    .center();
+  }
+  .masonry {
+    flex: 1;
+    .masonry-container {
+      margin: 0 auto;
+      .masonry-item {
+        background: #1faeff;
+        color: #fff;
+        .center();
+      }
+    }
+  }
+  .footer {
+    height: 64px;
+    .center();
+  }
 }
 </style>
