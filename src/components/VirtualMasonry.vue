@@ -154,7 +154,7 @@ export default {
     },
     // waterfall items
     itemsChanged() {
-      if (this.items.length < this.storedItemsLength) {
+      if (this.items.length <= this.storedItemsLength) {
         this.renderWaterfall();
       } else {
         this.computePosition();
