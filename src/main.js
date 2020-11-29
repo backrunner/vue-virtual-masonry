@@ -1,11 +1,11 @@
 import Vue from "vue";
 import App from "./App.vue";
-import VirtualMasonry from "../dist/vue-virtual-masonry.umd.min.js";
+import VirtualMasonry from "./libEntry.js";
 
 Vue.config.productionTip = false;
 
 Vue.use(VirtualMasonry, {
-  additionalDistance: 500
+  additionalDistance: 1000
 });
 
 new Vue({

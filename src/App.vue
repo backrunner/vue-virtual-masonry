@@ -4,9 +4,10 @@
     <div class="masonry">
       <VirtualMasonry
         :items="items"
-        :col="5"
+        :col="20"
         :fit="true"
-        :colWidth="200"
+        :colWidth="50"
+        :rowsPersection="1"
         :itemHeightGetter="heightGetter"
       >
         <template slot-scope="props">
@@ -29,12 +30,11 @@ export default {
   },
   created() {
     // generate items
-    const items = [];
-    for (let i = 0; i < 50; i++) {
-      items.push({
-        height: this.getRandomInt(100, 1000)
-      });
-    }
+    const items = new Array(100000).fill(1).map(() => {
+      return {
+        height: this.getRandomInt(50, 100)
+      };
+    });
     this.$set(this, "items", items);
   },
   methods: {
@@ -69,7 +69,7 @@ body,
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   .title {
     height: 120px;

@@ -1,5 +1,5 @@
 const options = {
-  additionalDistance: 300
+  additionalDistance: 500
 };
 
 export default {

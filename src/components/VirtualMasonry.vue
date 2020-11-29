@@ -2,8 +2,8 @@
   <div class="masonry-container" ref="container" :style="containerStyle">
     <div
       class="masonry-item"
-      v-for="item in displayItems"
-      :key="item._masonryIndex"
+      v-for="(item, index) in displayItems"
+      :key="index"
       :style="{
         width: `${colWidth}px`,
         height: `${positionMap[item._masonryIndex].height}px`,
@@ -25,6 +25,8 @@
 
 <script>
 import config from "../config";
+
+const GROUP_SIZE = 500;
 
 export default {
   props: {
@@ -55,6 +57,10 @@ export default {
     rowsPerSection: {
       type: Number,
       default: 3
+    },
+    groupSize: {
+      type: Number,
+      default: GROUP_SIZE
     }
   },
   data() {
@@ -62,6 +68,8 @@ export default {
       positionMap: {},
       widthStore: {},
       heightStore: {},
+      group: {},
+      inGroup: {},
       sections: [{}],
       sectionsIdx: 0,
       displayItems: [],
@@ -109,28 +117,30 @@ export default {
       this.resizeTimer = setTimeout(() => {
         this.screenWidthChanged(value);
       }, 300);
-    },
-    scrollTop: "pageScrolled"
+    }
   },
   created() {
     this.resetWidthStore();
     this.resetHeightStore();
     this.resetPositionMap();
     window.addEventListener("resize", this.handleWindowResize);
-    window.addEventListener("scroll", this.handleScroll, true);
+    window.addEventListener("scroll", this.handleScroll, {
+      passive: true
+    });
   },
   mounted() {
     this.containerWidth = this.getContainerWidth();
     this.containerOffset = this.getContainerOffset();
     this.renderWaterfall();
-    console.log("additionalDistance", this.additionalDistance);
   },
   updated() {
     this.containerWidth = this.getContainerWidth();
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleWindowResize);
-    window.removeEventListener("scroll", this.handleScroll, true);
+    window.removeEventListener("scroll", this.handleScroll, {
+      passive: true
+    });
   },
   methods: {
     // waterfall container
@@ -172,10 +182,8 @@ export default {
     screenWidthChanged() {
       this.containerWidth = this.getContainerWidth();
     },
-    pageScrolled() {
-      this.setDisplay();
-    },
     renderWaterfall() {
+      this.resetGroup();
       this.resetSections();
       this.resetWidthStore();
       this.resetHeightStore();
@@ -184,26 +192,31 @@ export default {
       this.setDisplay();
     },
     setDisplay() {
-      const countPerSection = this.columns * this.rowsPerSection;
+      const countPerSection = this.rowsPerSection * this.columns;
+      const showCondHead = this.scrollTop - this.additionalDistance;
+      const showCondTail =
+        this.scrollTop + this.screenHeight + this.additionalDistance;
+      const start = Math.floor(showCondHead / this.groupSize);
+      const end = Math.floor(showCondTail / this.groupSize);
+
       let list = [];
-      for (let i = 0; i < this.sections.length; i++) {
-        const section = this.sections[i];
-        const { head, tail } = section;
-        // console.log('index', i, 'head', head, 'tail', tail);
-        // console.log('scrollTop', this.scrollTop, 'cond', head <= this.scrollTop + this.screenHeight + ADDITIONAL_DISTANCE && tail > this.scrollTop - ADDITIONAL_DISTANCE);
-        const showCondHead =
-          this.scrollTop + this.screenHeight + this.additionalDistance;
-        const showCondTail = this.scrollTop - this.additionalDistance;
-        if (head <= showCondHead && tail > showCondTail) {
+      let inList = {};
+
+      for (let i = start; i <= end; i++) {
+        if (!this.group[i]) {
+          continue;
+        }
+        this.group[i].forEach(idx => {
+          if (inList[idx]) {
+            return;
+          }
           list = list.concat(
-            this.items.slice(i * countPerSection, (i + 1) * countPerSection)
+            this.items.slice(idx * countPerSection, (idx + 1) * countPerSection)
           );
-        }
-        if (head > showCondHead) {
-          // 有序数据，后面的都不会显示出来没必要遍历了
-          break;
-        }
+          inList[idx] = true;
+        });
       }
+
       if (window.requestAnimationFrame) {
         window.requestAnimationFrame(() => {
           this.displayItems = list;
@@ -229,6 +242,10 @@ export default {
     resetPositionMap() {
       this.positionMap = {};
       this.computePosition();
+    },
+    resetGroup() {
+      this.group = {};
+      this.inGroup = {};
     },
     resetSections() {
       this.sections = [{}];
@@ -277,7 +294,7 @@ export default {
         this.heightStore[storeIdx] += h + this.gap;
         // console.log('index', index, 'top', top);
         // console.log('heightStore', this.heightStore);
-        // set group position
+        // set position to section
         const sectionIdx = this.sections.length - 1;
         // console.log('sectionIdx', sectionIdx);
         const { head, tail } = this.sections[sectionIdx];
@@ -288,6 +305,22 @@ export default {
         if (typeof tail === "undefined" || bottom > tail) {
           this.sections[sectionIdx].tail = bottom;
         }
+      });
+      this.sections.forEach((section, idx) => {
+        // 把所有的section放到groupMap里面
+        if (this.inGroup[idx]) {
+          return;
+        }
+        const { head, tail } = section;
+        const start = Math.floor(head / this.groupSize);
+        const end = Math.floor(tail / this.groupSize);
+        for (let i = start; i <= end; i++) {
+          if (!this.group[i]) {
+            this.group[i] = [];
+          }
+          this.group[i].push(idx);
+        }
+        this.inGroup[idx] = true;
       });
     },
     getMinHeightCol() {
@@ -335,6 +368,7 @@ export default {
       this.containerOffset = this.getContainerOffset();
       this.scrollTop =
         document.documentElement.scrollTop - this.containerOffset;
+      this.setDisplay();
     }
   }
 };
