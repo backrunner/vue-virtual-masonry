@@ -4,9 +4,9 @@
     <div class="masonry">
       <VirtualMasonry
         :items="items"
-        :col="20"
+        :col="10"
         :fit="true"
-        :colWidth="50"
+        :colWidth="100"
         :rowsPersection="1"
         :itemHeightGetter="heightGetter"
       >
@@ -30,9 +30,9 @@ export default {
   },
   created() {
     // generate items
-    const items = new Array(100000).fill(1).map(() => {
+    const items = new Array(30000).fill(1).map(() => {
       return {
-        height: this.getRandomInt(50, 100)
+        height: this.getRandomInt(50, 500)
       };
     });
     this.$set(this, "items", items);

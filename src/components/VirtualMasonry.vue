@@ -2,8 +2,8 @@
   <div class="masonry-container" ref="container" :style="containerStyle">
     <div
       class="masonry-item"
-      v-for="(item, index) in displayItems"
-      :key="index"
+      v-for="item in displayItems"
+      :key="item._masonryIndex"
       :style="{
         width: `${colWidth}px`,
         height: `${positionMap[item._masonryIndex].height}px`,
@@ -131,7 +131,7 @@ export default {
   mounted() {
     this.containerWidth = this.getContainerWidth();
     this.containerOffset = this.getContainerOffset();
-    this.renderWaterfall();
+    this.renderMasonry();
   },
   updated() {
     this.containerWidth = this.getContainerWidth();
@@ -165,7 +165,7 @@ export default {
     // waterfall items
     itemsChanged() {
       if (this.items.length <= this.storedItemsLength) {
-        this.renderWaterfall();
+        this.renderMasonry();
       } else {
         this.computePosition();
         this.setMaxHeight();
@@ -174,15 +174,15 @@ export default {
       this.storedItemsLength = this.items.length;
     },
     columnsChanged() {
-      this.renderWaterfall();
+      this.renderMasonry();
     },
     colWidthChanged() {
-      this.renderWaterfall();
+      this.renderMasonry();
     },
     screenWidthChanged() {
       this.containerWidth = this.getContainerWidth();
     },
-    renderWaterfall() {
+    renderMasonry() {
       this.resetGroup();
       this.resetSections();
       this.resetWidthStore();
@@ -312,6 +312,9 @@ export default {
           return;
         }
         const { head, tail } = section;
+        if (typeof head === "undefined" || typeof tail === "undefined") {
+          return;
+        }
         const start = Math.floor(head / this.groupSize);
         const end = Math.floor(tail / this.groupSize);
         for (let i = start; i <= end; i++) {
