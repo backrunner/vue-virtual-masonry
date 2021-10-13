@@ -25,17 +25,17 @@
 export default {
   data() {
     return {
-      items: []
+      items: [],
     };
   },
   created() {
     // generate items
     const items = new Array(30000).fill(1).map(() => {
       return {
-        height: this.getRandomInt(50, 500)
+        height: this.getRandomInt(50, 500),
       };
     });
-    this.$set(this, "items", items);
+    this.$set(this, 'items', items);
   },
   methods: {
     heightGetter(item) {
@@ -43,8 +43,8 @@ export default {
     },
     getRandomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-  }
+    },
+  },
 };
 </script>
 

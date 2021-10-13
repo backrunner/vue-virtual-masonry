@@ -6,8 +6,8 @@ Inspired by starkwang's [vue-virtual-collection](https://github.com/starkwang/vu
 
 ## Install
 
-```shell
-$ npm i vue-virtual-masonry
+```bash
+npm i vue-virtual-masonry
 ```
 
 ## Usage
@@ -167,7 +167,7 @@ Every data will be added a property named `_masonryIndex` to show the index of t
 
 Also, you can get position info from slot, here's an example of position info:
 
-```
+```js
 {
   left: 200,  // absolute left position of the cell
   top: 0,  // absolute top position of the cell

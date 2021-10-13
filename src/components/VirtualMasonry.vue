@@ -1,30 +1,32 @@
 <template>
   <div class="masonry-container" ref="container" :style="containerStyle">
-    <div
-      class="masonry-item"
-      v-for="item in displayItems"
-      :key="item._masonryIndex"
-      :style="{
-        width: `${colWidth}px`,
-        height: `${positionMap[item._masonryIndex].height}px`,
-        top: `${positionMap[item._masonryIndex].top}px`,
-        left: `${positionMap[item._masonryIndex].left}px`
-      }"
-    >
-      <slot
-        :data="item"
-        :position="{
-          ...positionMap[item._masonryIndex],
-          colWidth
+    <template v-if="displayItems.length">
+      <div
+        class="masonry-item"
+        v-for="item in displayItems"
+        :key="item._masonryIndex"
+        :style="{
+          width: `${colWidth}px`,
+          height: `${positionMap[item._masonryIndex].height}px`,
+          top: `${positionMap[item._masonryIndex].top}px`,
+          left: `${positionMap[item._masonryIndex].left}px`,
         }"
       >
-      </slot>
-    </div>
+        <slot
+          :data="item"
+          :position="{
+            ...positionMap[item._masonryIndex],
+            colWidth,
+          }"
+        >
+        </slot>
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
-import config from "../config";
+import config from '../config';
 
 const GROUP_SIZE = 500;
 
@@ -32,36 +34,36 @@ export default {
   props: {
     itemHeightGetter: {
       type: Function,
-      required: true
+      required: true,
     },
     items: {
       type: Array,
-      required: true
+      required: true,
     },
     colWidth: {
       type: Number,
-      required: true
+      required: true,
     },
     col: {
       type: Number,
-      default: 0
+      default: 0,
     },
     gap: {
       type: Number,
-      default: 16
+      default: 16,
     },
     fit: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rowsPerSection: {
       type: Number,
-      default: 3
+      default: 3,
     },
     groupSize: {
       type: Number,
-      default: GROUP_SIZE
-    }
+      default: GROUP_SIZE,
+    },
   },
   data() {
     return {
@@ -81,7 +83,7 @@ export default {
       screenHeight: document.documentElement.clientHeight,
       scrollTop: document.documentElement.scrollTop,
       containerOffset: 0,
-      additionalDistance: config.options.additionalDistance
+      additionalDistance: config.options.additionalDistance,
     };
   },
   computed: {
@@ -89,9 +91,7 @@ export default {
       if (this.col) {
         return this.col;
       } else {
-        return Math.floor(
-          (this.containerWidth + this.gap) / (this.colWidth + this.gap)
-        );
+        return Math.floor((this.containerWidth + this.gap) / (this.colWidth + this.gap));
       }
     },
     containerFitWidth() {
@@ -102,14 +102,14 @@ export default {
       const height = `${this.maxHeight || 0}px`;
       return {
         width,
-        height
+        height,
       };
-    }
+    },
   },
   watch: {
-    items: "itemsChanged",
-    columns: "columnsChanged",
-    colWidth: "colWidthChanged",
+    items: 'itemsChanged',
+    columns: 'columnsChanged',
+    colWidth: 'colWidthChanged',
     screenWidth(value) {
       if (this.resizeTimer) {
         clearTimeout(this.resizeTimer);
@@ -117,15 +117,15 @@ export default {
       this.resizeTimer = setTimeout(() => {
         this.screenWidthChanged(value);
       }, 300);
-    }
+    },
   },
   created() {
     this.resetWidthStore();
     this.resetHeightStore();
     this.resetPositionMap();
-    window.addEventListener("resize", this.handleWindowResize);
-    window.addEventListener("scroll", this.handleScroll, {
-      passive: true
+    window.addEventListener('resize', this.handleWindowResize);
+    window.addEventListener('scroll', this.handleScroll, {
+      passive: true,
     });
   },
   mounted() {
@@ -137,9 +137,9 @@ export default {
     this.containerWidth = this.getContainerWidth();
   },
   beforeDestroy() {
-    window.removeEventListener("resize", this.handleWindowResize);
-    window.removeEventListener("scroll", this.handleScroll, {
-      passive: true
+    window.removeEventListener('resize', this.handleWindowResize);
+    window.removeEventListener('scroll', this.handleScroll, {
+      passive: true,
     });
   },
   methods: {
@@ -194,27 +194,25 @@ export default {
     setDisplay() {
       const countPerSection = this.rowsPerSection * this.columns;
       const showCondHead = this.scrollTop - this.additionalDistance;
-      const showCondTail =
-        this.scrollTop + this.screenHeight + this.additionalDistance;
+      const showCondTail = this.scrollTop + this.screenHeight + this.additionalDistance;
       const start = Math.floor(showCondHead / this.groupSize);
       const end = Math.floor(showCondTail / this.groupSize);
 
       let list = [];
-      let inList = {};
+      const inList = {};
 
       for (let i = start; i <= end; i++) {
         if (!this.group[i]) {
           continue;
         }
-        this.group[i].forEach(idx => {
+        for (let j = 0; j < this.group[i].length; j++) {
+          const idx = this.group[i][j];
           if (inList[idx]) {
-            return;
+            continue;
           }
-          list = list.concat(
-            this.items.slice(idx * countPerSection, (idx + 1) * countPerSection)
-          );
+          list = list.concat(this.items.slice(idx * countPerSection, (idx + 1) * countPerSection));
           inList[idx] = true;
-        });
+        }
       }
 
       if (window.requestAnimationFrame) {
@@ -240,6 +238,7 @@ export default {
       }
     },
     resetPositionMap() {
+      this.displayItems = [];
       this.positionMap = {};
       this.computePosition();
     },
@@ -259,6 +258,7 @@ export default {
       this.items.forEach((item, index) => {
         // ignore computed
         const mapKey = index;
+        // eslint-disable-next-line no-param-reassign
         item._masonryIndex = index;
         if (this.positionMap[mapKey]) {
           return;
@@ -266,7 +266,7 @@ export default {
         this.$set(this.positionMap, mapKey, {});
         // compute load height
         const h = this.itemHeightGetter(item);
-        this.$set(this.positionMap[mapKey], "height", h);
+        this.$set(this.positionMap[mapKey], 'height', h);
         // compute position
         let left;
         let top;
@@ -289,20 +289,17 @@ export default {
           this.sections.push({});
         }
         // set position
-        this.$set(this.positionMap[mapKey], "left", left);
-        this.$set(this.positionMap[mapKey], "top", top);
+        this.$set(this.positionMap[mapKey], 'left', left);
+        this.$set(this.positionMap[mapKey], 'top', top);
         this.heightStore[storeIdx] += h + this.gap;
-        // console.log('index', index, 'top', top);
-        // console.log('heightStore', this.heightStore);
         // set position to section
         const sectionIdx = this.sections.length - 1;
-        // console.log('sectionIdx', sectionIdx);
         const { head, tail } = this.sections[sectionIdx];
-        if (typeof head === "undefined" || top < head) {
+        if (typeof head === 'undefined' || top < head) {
           this.sections[sectionIdx].head = top;
         }
         const bottom = top + h;
-        if (typeof tail === "undefined" || bottom > tail) {
+        if (typeof tail === 'undefined' || bottom > tail) {
           this.sections[sectionIdx].tail = bottom;
         }
       });
@@ -312,7 +309,7 @@ export default {
           return;
         }
         const { head, tail } = section;
-        if (typeof head === "undefined" || typeof tail === "undefined") {
+        if (typeof head === 'undefined' || typeof tail === 'undefined') {
           return;
         }
         const start = Math.floor(head / this.groupSize);
@@ -369,11 +366,10 @@ export default {
       }
       this.lastScroll = Date.now();
       this.containerOffset = this.getContainerOffset();
-      this.scrollTop =
-        document.documentElement.scrollTop - this.containerOffset;
+      this.scrollTop = document.documentElement.scrollTop - this.containerOffset;
       this.setDisplay();
-    }
-  }
+    },
+  },
 };
 </script>
 

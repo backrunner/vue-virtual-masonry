@@ -1,7 +1,7 @@
 const options = {
-  additionalDistance: 500
+  additionalDistance: 500,
 };
 
 export default {
-  options
+  options,
 };
