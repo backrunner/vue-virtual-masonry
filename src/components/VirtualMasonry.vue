@@ -362,22 +362,23 @@ export default {
     handleWindowScroll() {
       this.handleScroll();
     },
-    handleScroll(timeout = false) {
-      if (timeout && this.lastScroll && Date.now() - this.lastScroll < 200) {
-        return;
+    handleScroll() {
+      if (this.scrollTimer) {
+        clearTimeout(this.scrollTimer);
+        this.scrollTimer = null;
       }
-      if (timeout) {
-        if (this.scrollTimer) {
-          clearTimeout(this.scrollTimer);
-        }
-        this.scrollTimer = setTimeout(() => {
-          this.handleScroll.apply(this, [true]);
-        }, 200);
+      this.scrollTimer = setTimeout(() => {
+        this.handleScroll.apply(true);
+      }, 200);
+      if (this.lastScroll && Date.now() - this.lastScroll < 200) {
+        return;
       }
       this.lastScroll = Date.now();
       this.containerOffset = this.getContainerOffset();
       this.scrollTop = document.documentElement.scrollTop - this.containerOffset;
       this.setDisplay();
+      clearTimeout(this.scrollTimer);
+      this.scrollTimer = null;
     },
   },
 };
