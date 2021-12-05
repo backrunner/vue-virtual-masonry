@@ -3,14 +3,9 @@
     <template v-if="displayItems.length">
       <div
         class="masonry-item"
-        v-for="item in displayItems"
-        :key="item._masonryIndex"
-        :style="{
-          width: `${colWidth}px`,
-          height: `${positionMap[item._masonryIndex].height}px`,
-          top: `${positionMap[item._masonryIndex].top}px`,
-          left: `${positionMap[item._masonryIndex].left}px`,
-        }"
+        v-for="(item, index) in displayItems"
+        :key="index"
+        :style="getItemStyles(item._masonryIndex)"
       >
         <slot
           :data="item"
@@ -28,7 +23,7 @@
 <script>
 import config from '../config';
 
-const GROUP_SIZE = 500;
+const GROUP_SIZE = 600;
 
 export default {
   props: {
@@ -124,7 +119,7 @@ export default {
     this.resetHeightStore();
     this.resetPositionMap();
     window.addEventListener('resize', this.handleWindowResize);
-    window.addEventListener('scroll', this.handleScroll, {
+    window.addEventListener('scroll', this.handleWindowScroll, {
       passive: true,
     });
   },
@@ -138,9 +133,7 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleWindowResize);
-    window.removeEventListener('scroll', this.handleScroll, {
-      passive: true,
-    });
+    window.removeEventListener('scroll', this.handleWindowScroll);
   },
   methods: {
     // waterfall container
@@ -161,6 +154,13 @@ export default {
       const bodyRect = document.documentElement.getBoundingClientRect();
       const elRect = this.$refs.container.getBoundingClientRect();
       return elRect.top - bodyRect.top;
+    },
+    getItemStyles(idx) {
+      return {
+        width: `${this.colWidth}px`,
+        height: `${this.positionMap[idx].height}px`,
+        transform: `translateX(${this.positionMap[idx].left}px) translateY(${this.positionMap[idx].top}px)`,
+      };
     },
     // waterfall items
     itemsChanged() {
@@ -352,11 +352,14 @@ export default {
       this.screenHeight = document.documentElement.clientHeight;
       this.containerOffset = this.getContainerOffset();
     },
+    handleWindowScroll() {
+      this.handleScroll();
+    },
     handleScroll(timeout = false) {
-      if (!timeout && this.lastScroll && Date.now() - this.lastScroll < 200) {
+      if (timeout && this.lastScroll && Date.now() - this.lastScroll < 200) {
         return;
       }
-      if (!timeout) {
+      if (timeout) {
         if (this.scrollTimer) {
           clearTimeout(this.scrollTimer);
         }
@@ -376,9 +379,11 @@ export default {
 <style lang="less" scoped>
 .masonry-container {
   position: relative;
-  transform: translate3d(0, 0, 0);
+  -webkit-overflow-scrolling: touch;
   .masonry-item {
     position: absolute;
+    left: 0;
+    top: 0;
   }
 }
 </style>

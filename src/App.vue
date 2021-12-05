@@ -7,7 +7,7 @@
         :col="10"
         :fit="true"
         :colWidth="100"
-        :rowsPersection="1"
+        :rowsPersection="5"
         :itemHeightGetter="heightGetter"
       >
         <template slot-scope="props">
