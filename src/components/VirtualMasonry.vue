@@ -4,7 +4,7 @@
       <div
         class="masonry-item"
         v-for="(item, index) in displayItems"
-        :key="index"
+        :key="getKey(item, index)"
         :style="getItemStyles(item._masonryIndex)"
       >
         <slot
@@ -58,6 +58,10 @@ export default {
     groupSize: {
       type: Number,
       default: GROUP_SIZE,
+    },
+    recycleNode: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -136,6 +140,9 @@ export default {
     window.removeEventListener('scroll', this.handleWindowScroll);
   },
   methods: {
+    getKey(item, index) {
+      return this.recycleNode ? index : item._masonryIndex;
+    },
     // waterfall container
     getContainerWidth() {
       if (this.fit && this.col) {

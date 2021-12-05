@@ -1,6 +1,6 @@
 {
   "name": "vue-virtual-masonry",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "A virtual masonry component for Vue.",
   "main": "dist/vue-virtual-masonry.umd.min.js",
   "files": [
@@ -32,15 +32,15 @@
     "url": "https://github.com/backrunner/vue-virtual-masonry/issues"
   },
   "dependencies": {
-    "core-js": "^3.18.3",
+    "core-js": "^3.19.2",
     "vue": "^2.6.14"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.13",
-    "@vue/cli-plugin-eslint": "~4.5.13",
-    "@vue/cli-service": "~4.5.13",
+    "@vue/cli-plugin-babel": "~4.5.15",
+    "@vue/cli-plugin-eslint": "~4.5.15",
+    "@vue/cli-service": "~4.5.15",
     "@vue/eslint-config-prettier": "^6.0.0",
-    "f2elint": "^1.2.1",
+    "f2elint": "^1.2.3",
     "less": "^3.13.1",
     "less-loader": "^7.3.0",
     "prettier": "^1.19.1",
