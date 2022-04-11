@@ -1,7 +1,6 @@
 module.exports = {
-  extends: [
-    'eslint-config-ali/vue',
-    "prettier",
-    'prettier/vue',
-  ],
+  extends: ['eslint-config-alloy/vue', 'prettier'],
+  rules: {
+    'vue/component-tags-order': 0,
+  },
 };

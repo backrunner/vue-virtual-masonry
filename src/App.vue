@@ -10,7 +10,7 @@
         :rowsPersection="5"
         :itemHeightGetter="heightGetter"
       >
-        <template slot-scope="props">
+        <template #default="props">
           <p>{{ props.data._masonryIndex }}</p>
         </template>
       </VirtualMasonry>

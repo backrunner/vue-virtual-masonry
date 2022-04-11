@@ -1,10 +1,10 @@
 <template>
-  <div class="masonry-container" ref="container" :style="containerStyle">
+  <div ref="container" class="masonry-container" :style="containerStyle">
     <template v-if="displayItems.length">
       <div
-        class="masonry-item"
         v-for="(item, index) in displayItems"
         :key="getKey(item, index)"
+        class="masonry-item"
         :style="getItemStyles(item._masonryIndex)"
       >
         <slot
