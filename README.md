@@ -36,11 +36,7 @@ In your page, use the component like this:
 ```vue
 <template>
   <div class="masonry">
-    <VirtualMasonry
-      :items="items"
-      :colWidth="200"
-      :itemHeightGetter="heightGetter"
-      >
+    <VirtualMasonry :items="items" :colWidth="200" :itemHeightGetter="heightGetter">
       <template slot-scope="props"></template>
     </VirtualMasonry>
   </div>
@@ -54,8 +50,8 @@ export default {
   methods: {
     heightGetter(item) {
       return item.height;
-    }
-  }
+    },
+  },
 };
 ```
 
@@ -74,7 +70,7 @@ If you want to render a certain columns masonry, you can set the component like 
       :col="3"
       :fit="true"
       :itemHeightGetter="heightGetter"
-      >
+    >
       <template slot-scope="props"></template>
     </VirtualMasonry>
   </div>
@@ -103,7 +99,7 @@ Type: `Number`
 
 Required: `true`
 
-Width of column in masonry.
+The width of column in masonry.
 
 #### itemHeightGetter
 
@@ -111,7 +107,9 @@ Type: `Function`
 
 Required: `true`
 
-A function return the height of each cells.
+Returns: `Number`
+
+A function return the height of each cells. It should return a number indicating the height of the cell corresponding to the parameter item.
 
 #### col
 
