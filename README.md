@@ -87,11 +87,11 @@ You can find more details in the reference.
 
 #### items
 
-Type: `Array`
+Type: `Array<object>`
 
 Required: `true`
 
-The collecton you want to render in masonry.
+The collecton you want to render in masonry. Every item in the collection should be an `object`.
 
 #### colWidth
 

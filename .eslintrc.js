@@ -3,4 +3,8 @@ module.exports = {
   rules: {
     'vue/component-tags-order': 0,
   },
+  parser: 'vue-eslint-parser',
+  parserOptions: {
+    parser: '@babel/eslint-parser',
+  },
 };
